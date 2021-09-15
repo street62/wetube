@@ -8,9 +8,30 @@ const handleLogin = (req, res) => {
   res.send("login here!");
 }
 
-app.get("/", (req, res) => {
-  return res.send("I still love you.");
-})
+const loggerMiddleware = (req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+}
+const protectionMiddleware = (req, res, next) => {
+  const url = req.url;
+  if(url === "/protected") {
+    return res.send("<h1>Not Allowed!</h1>");
+  }
+  console.log("Allowed. You may continue.");
+  next();
+}
+const handleHome = (req, res, next) => {
+  return res.send("I love middlewares!");
+}
+
+const handleProtected = (req, res, next) => {
+  return res.send("Welcome to the private lounge");
+}
+
+app.use(loggerMiddleware);
+app.use(protectionMiddleware);
+app.get("/", handleHome);
 app.get("/login", handleLogin);
+app.get("/protected", handleProtected);
 
 app.listen(PORT, handleListening);
